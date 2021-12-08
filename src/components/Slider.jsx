@@ -4,7 +4,7 @@ import {
   KeyboardArrowLeftOutlined,
   KeyboardArrowRightOutlined,
 } from "@mui/icons-material";
-import { sliderItems } from "../slider_data";
+import { sliderItems } from "../data";
 
 const Container = styled.div`
   width: 100%;
