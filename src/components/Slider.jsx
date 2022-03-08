@@ -5,6 +5,7 @@ import {
   KeyboardArrowRightOutlined,
 } from "@mui/icons-material";
 import { sliderItems } from "../data";
+import { mobile } from "../responsive";
 
 const Container = styled.div`
   width: 100%;
@@ -13,6 +14,7 @@ const Container = styled.div`
   //background-color: #db7430;
   position: relative;
   overflow: hidden;
+  ${mobile({ display: "none" })}
 `;
 
 const Arrow = styled.div`
