@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const CryptoJS = require("crypto-js");
+const jwt = require("jsonwebtoken");
 
 const router = require("express").Router();
 
@@ -42,12 +43,22 @@ router.post("/login", async (req, res) => {
     passwordDecrypt !== req.body.password &&
       res.status(401).json("Wrong Credentials");
 
+    //jwt
+    const accessToken = jwt.sign(
+      {
+        id: user._id,
+        isAdmin: user.isAdmin,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "4h" }
+    );
+
     //desestructura el user para que no mande el password en la respuesta
     //si no le pones el .doc trae todos los datos de mongodb
     const { password, ...others } = user._doc;
 
     //si todo sale ok retorna
-    res.status(200).json(others);
+    res.status(200).json({ ...others, accessToken });
   } catch (error) {
     res.status(500).json(error);
   }
