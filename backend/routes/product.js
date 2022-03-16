@@ -36,61 +36,50 @@ router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 // //DELETE
-// router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
-//   try {
-//     await User.findByIdAndDelete(req.params.id);
-//     res.status(200).json("User has been deleted.");
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
+router.delete("/:id", verifyTokenAndAuthorization, async (req, res) => {
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.status(200).json("Product has been deleted.");
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
-// //GET USER
-// router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     const { password, ...others } = user._doc;
-//     res.status(200).json(others);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
+//GET PRODUCT
+router.get("/find/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    //const { password, ...others } = user._doc;
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
 
-// //GET ALL USERS
-// router.get("/", verifyTokenAndAdmin, async (req, res) => {
-//   const query = req.query.new;
-//   try {
-//     //devuelve solo los ultimos 5 usuarios
-//     const users = query
-//       ? await User.find().sort({ _id: -1 }).limit(5)
-//       : await User.find();
-//     res.status(200).json(users);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
+//GET ALL PRODUCTS
+router.get("/", async (req, res) => {
+  const qNew = req.query.new;
+  const qCategory = req.query.category;
 
-// //GET USER STATS
-// router.get("/stats", verifyTokenAndAdmin, async (req, res) => {
-//   const date = new Date();
-//   //para buscar en el ultimo año
-//   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+  try {
+    let products = [];
+    if (qNew) {
+      products = await Product.find().sort({ createdAt: -1 }).limit(5);
+    } else if (qCategory) {
+      //buscar los productos que tengan la categoria elegida
+      products = await Product.find({
+        categories: {
+          $in: [qCategory],
+        },
+      });
+    } else {
+      products = await Product.find();
+    }
 
-//   //devuelve el numero total de usuarios por mes
-//   try {
-//     //para agrupar los datos de la bd por mes
-//     const data = await User.aggregate([
-//       //condicion: devolver todos los usuarios creados hasta hoy y del ultimo año
-//       { $match: { createdAt: { $gte: lastYear } } },
-//       //toma el mes de la fecha del campo createdAt y lo agrega a la variable month
-//       { $project: { month: { $month: "$createdAt" } } },
-//       //devuelve los datos y los suma para saber la cantidad de usuarios registrados por mes
-//       { $group: { _id: "$month", total: { $sum: 1 } } },
-//     ]);
-//     res.status(200).json(data);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// });
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json("No se encontro el producto que busca");
+  }
+});
 
 module.exports = router;
